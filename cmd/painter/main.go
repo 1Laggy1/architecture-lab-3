@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"path/filepath"
 
 	"github.com/1Laggy1/architecture-lab-3/painter"
 	"github.com/1Laggy1/architecture-lab-3/painter/lang"
@@ -23,11 +24,45 @@ func main() {
 	pv.OnScreenReady = opLoop.Start
 	opLoop.Receiver = &pv
 
+	// Handle requests for the root ("/") endpoint with lang.HttpHandler
+	http.Handle("/", lang.HttpHandler(&opLoop, &parser))
+
+	// Serve the index.html file
+	http.HandleFunc("/buttons", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, filepath.Join("static", "index.html"))
+	})
+
+	// Serve the main.js file
+	http.HandleFunc("/scripts/main.js", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/javascript")
+		http.ServeFile(w, r, filepath.Join("../../scripts", "main.js"))
+	})
+
+	http.HandleFunc("/scripts/green.js", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/javascript")
+		http.ServeFile(w, r, filepath.Join("../../scripts", "green.js"))
+	})
+
+	// Serve the white.js file
+	http.HandleFunc("/scripts/white.js", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/javascript")
+		http.ServeFile(w, r, filepath.Join("../../scripts", "white.js"))
+	})
+	http.HandleFunc("/scripts/update.js", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/javascript")
+		http.ServeFile(w, r, filepath.Join("../../scripts", "update.js"))
+	})
+
+	// Start the HTTP server
 	go func() {
-		http.Handle("/", lang.HttpHandler(&opLoop, &parser))
-		_ = http.ListenAndServe("localhost:17000", nil)
+		if err := http.ListenAndServe("localhost:17000", nil); err != nil {
+			panic(err)
+		}
 	}()
 
+	// Start the ui.Visualizer
 	pv.Main()
+
+	// Stop and wait for the painter.Loop to finish
 	opLoop.StopAndWait()
 }
