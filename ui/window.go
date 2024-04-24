@@ -62,8 +62,8 @@ func (pv *Visualizer) run(s screen.Screen) {
     }
 
     pv.w = w
-		pv.crossX = 350
-    pv.crossY = 350
+		pv.crossX = 400
+    pv.crossY = 400
 
     events := make(chan interface{})
     go func() {
@@ -138,15 +138,19 @@ func (pv *Visualizer) handleEvent(e interface{}, t screen.Texture) {
 }
 
 func (pv *Visualizer) drawDefaultUI() {
-    pv.w.Fill(pv.sz.Bounds(), color.RGBA{0, 255, 0, 255}, draw.Src) // Фон зеленого кольору.
+	pv.w.Fill(pv.sz.Bounds(), color.RGBA{0, 255, 0, 255}, draw.Src) // Зелений фон.
 
-    // Малювання жовтого хрестика
-    crossX := pv.crossX - 50
-    crossY := pv.crossY - 50
-    pv.w.Fill(image.Rect(crossX, pv.crossY-5, crossX+100, pv.crossY+5), color.RGBA{255, 255, 0, 255}, draw.Src)
-    pv.w.Fill(image.Rect(pv.crossX-5, crossY, pv.crossX+5, crossY+100), color.RGBA{255, 255, 0, 255}, draw.Src)
+	// Малювання жовтого хрестика
+	crossX := pv.crossX
+	crossY := pv.crossY
+	crossLen := 200  // Нова довжина хрестика
+	crossThickness := 20  // Нова товщина хрестика
 
-    // Виправлення координат хрестика
-    pv.crossX += 50
-    pv.crossY += 50
+	// Вертикальна лінія
+	verticalLine := image.Rect(crossX-crossThickness/2, crossY-crossLen/2, crossX+crossThickness/2, crossY+crossLen/2)
+	pv.w.Fill(verticalLine, color.RGBA{255, 255, 0, 255}, draw.Src)
+
+	// Горизонтальна лінія
+	horizontalLine := image.Rect(crossX-crossLen/2, crossY-crossThickness/2, crossX+crossLen/2, crossY+crossThickness/2)
+	pv.w.Fill(horizontalLine, color.RGBA{255, 255, 0, 255}, draw.Src)
 }
