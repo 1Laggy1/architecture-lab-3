@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"strings"
-
 	"github.com/1Laggy1/architecture-lab-3/painter"
 )
 
