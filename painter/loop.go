@@ -22,6 +22,7 @@ type Loop struct {
 
 	stop    chan struct{}
 	stopReq bool
+	stopped chan struct{}
 }
 
 var size = image.Pt(400, 400)
@@ -32,29 +33,51 @@ func (l *Loop) Start(s screen.Screen) {
 	l.prev, _ = s.NewTexture(size)
 
 	// TODO: стартувати цикл подій.
+	l.stopped = make(chan struct{})
+	go func() {
+		for !l.stopReq || !l.mq.empty() {
+			op := l.mq.pull()
+			update := op.Do(l.next)
+			if update {
+				l.Receiver.Update(l.next)
+				l.next, l.prev = l.prev, l.next
+			}
+		}
+		close(l.stopped)
+	}()
 }
 
 // Post додає нову операцію у внутрішню чергу.
 func (l *Loop) Post(op Operation) {
-	if update := op.Do(l.next); update {
-		l.Receiver.Update(l.next)
-		l.next, l.prev = l.prev, l.next
-	}
+	l.mq.push(op)
 }
 
 // StopAndWait сигналізує про необхідність завершити цикл та блокується до моменту його повної зупинки.
 func (l *Loop) StopAndWait() {
+l.Post(OperationFunc(func(screen.Texture) {
+	l.stopReq = true
+}))
+<-l.stopped
 }
 
 // TODO: Реалізувати чергу подій.
-type messageQueue struct{}
+type messageQueue struct{
+	queue []Operation
+}
 
-func (mq *messageQueue) push(op Operation) {}
+func (mq *messageQueue) push(op Operation) {
+mq.queue = append(mq.queue, op) 
+}
 
 func (mq *messageQueue) pull() Operation {
-	return nil
+	if len(mq.queue) == 0 {
+		return nil
+	}
+	op := mq.queue[0]
+	mq.queue = mq.queue[1:]
+	return op
 }
 
 func (mq *messageQueue) empty() bool {
-	return false
+	return len(mq.queue) == 0
 }
