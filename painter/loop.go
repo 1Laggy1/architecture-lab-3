@@ -31,7 +31,7 @@ var size = image.Pt(400, 400)
 func (l *Loop) Start(s screen.Screen) {
 	l.next, _ = s.NewTexture(size)
 	l.prev, _ = s.NewTexture(size)
-
+	l.mq = messageQueue{}
 	// TODO: стартувати цикл подій.
 	l.stopped = make(chan struct{})
 	go func() {
