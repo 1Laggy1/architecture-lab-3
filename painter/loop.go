@@ -2,7 +2,7 @@ package painter
 
 import (
 	"image"
-
+	"fmt"
 	"golang.org/x/exp/shiny/screen"
 )
 
@@ -31,25 +31,29 @@ var size = image.Pt(400, 400)
 func (l *Loop) Start(s screen.Screen) {
 	l.next, _ = s.NewTexture(size)
 	l.prev, _ = s.NewTexture(size)
-	l.mq = messageQueue{}
 	// TODO: стартувати цикл подій.
 	l.stopped = make(chan struct{})
 	go func() {
 		for !l.stopReq || !l.mq.empty() {
+			if len(l.mq.queue) != 0 {
+	
+			fmt.Println("Next queue")
 			op := l.mq.pull()
+			fmt.Println("Operation pulled from queue:", op)
 			update := op.Do(l.next)
 			if update {
 				l.Receiver.Update(l.next)
 				l.next, l.prev = l.prev, l.next
 			}
+			}
 		}
 		close(l.stopped)
 	}()
 }
-
 // Post додає нову операцію у внутрішню чергу.
 func (l *Loop) Post(op Operation) {
 	l.mq.push(op)
+	fmt.Println("Operation added to queue:", op)
 }
 
 // StopAndWait сигналізує про необхідність завершити цикл та блокується до моменту його повної зупинки.
