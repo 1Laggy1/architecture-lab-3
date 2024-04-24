@@ -5,7 +5,7 @@ import (
 
 	"github.com/1Laggy1/architecture-lab-3/painter"
 	"github.com/1Laggy1/architecture-lab-3/painter/lang"
-	"github.com/1Laggy1/architecture-lab-3//ui"
+	"github.com/1Laggy1/architecture-lab-3/ui"
 )
 
 func main() {
