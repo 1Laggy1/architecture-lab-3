@@ -21,8 +21,9 @@ jobs:
     - name: Install dependencies
       run: go mod download
 
-    - name: Run tests in /painter/
-      run: go test ./painter/
-
-    - name: Run tests in /painter/lang
-      run: go test ./painter/lang
+    - name: Run tests
+      run: |
+        cd painter
+        go test
+	cd /test
+	go test
