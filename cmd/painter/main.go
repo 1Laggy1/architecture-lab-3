@@ -52,14 +52,6 @@ func main() {
 		w.Header().Set("Content-Type", "application/javascript")
 		http.ServeFile(w, r, filepath.Join("../../scripts", "update.js"))
 	})
-	http.HandleFunc("/scripts/move.js", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/javascript")
-		http.ServeFile(w, r, filepath.Join("../../scripts", "move.js"))
-	})
-	http.HandleFunc("/scripts/figure.js", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/javascript")
-		http.ServeFile(w, r, filepath.Join("../../scripts", "figure.js"))
-	})
 
 	// Start the HTTP server
 	go func() {
