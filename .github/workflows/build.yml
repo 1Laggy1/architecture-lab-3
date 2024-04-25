@@ -23,10 +23,10 @@ jobs:
 
     - name: Run looptest
       run: |
-        cd /painter
+        cd painter
         go test
 
     - name: Run parsertest
       run: |
-        cd /test
+        cd test
         go test
