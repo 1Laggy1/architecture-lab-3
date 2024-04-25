@@ -4,7 +4,6 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
-	//"reflect"
 	"testing"
 
 	"golang.org/x/exp/shiny/screen"
@@ -17,16 +16,20 @@ func TestLoop_Post(t *testing.T) {
 	)
 	l.Receiver = &tr
 
-
 	l.Start(mockScreen{})
-	l.Post(logOp(t, "do white fill", WhiteFill))
-	l.Post(logOp(t, "do green fill", GreenFill))
+	l.Post(logOp(t, "do white fill", OperationFunc(func(t screen.Texture) {
+		OperationFill{Color: color.White}.Do(t)
+	})))
+	l.Post(logOp(t, "do green fill", OperationFunc(func(t screen.Texture) {
+		OperationFill{Color: color.RGBA{0, 255, 0, 255}}.Do(t)
+	})))
 	l.Post(UpdateOp)
 
 	for i := 0; i < 3; i++ {
-		go l.Post(logOp(t, "do green fill", GreenFill))
+		go l.Post(logOp(t, "do green fill", OperationFunc(func(t screen.Texture) {
+			OperationFill{Color: color.RGBA{0, 255, 0, 255}}.Do(t)
+		})))
 	}
-
 
 	l.StopAndWait()
 
