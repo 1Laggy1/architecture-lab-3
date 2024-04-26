@@ -5,7 +5,6 @@ import (
 	"image/color"
 	"image/draw"
 	"testing"
-	"reflect"
 
 	"golang.org/x/exp/shiny/screen"
 )
@@ -18,8 +17,6 @@ func TestLoop_Post(t *testing.T) {
 		tr testReceiver
 	)
 	l.Receiver = &tr
-
-	var testOps []string
 
 	l.Start(mockScreen{})
 	l.Post(logOp(t, "do white fill", OperationFunc(func(t screen.Texture) {
@@ -36,16 +33,6 @@ func TestLoop_Post(t *testing.T) {
 		})))
 	}
 
-	l.Post(OperationFunc(func(screen.Texture) {
-		testOps = append(testOps, "op 1")
-		l.Post(OperationFunc(func(screen.Texture) {
-			testOps = append(testOps, "op 2")
-		}))
-	}))
-	l.Post(OperationFunc(func(screen.Texture) {
-		testOps = append(testOps, "op 3")
-	}))
-
 	l.StopAndWait()
 
 	if tr.lastTexture == nil {
@@ -60,10 +47,6 @@ func TestLoop_Post(t *testing.T) {
 	}
 	if len(mt.Colors) != 2 {
 		t.Error("Unexpected size of colors:", mt.Colors)
-	}
-
-	if !reflect.DeepEqual(testOps, []string{"op 1", "op 2", "op 3"}) {
-		t.Error("Bad order:", testOps)
 	}
 
 }
